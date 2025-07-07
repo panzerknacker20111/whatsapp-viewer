@@ -47,7 +47,7 @@ void QueryMessagesThread::run()
 		"message_location.latitude, message_location.longitude, message_thumbnail.thumbnail, "
 		"message_quoted_media.thumbnail, "
 		"message_quoted.key_id, message_link._id, "
-		"receipts.remote_resource "
+		"sender_jid.user AS remote_resource "
 		"FROM message "
 		"LEFT JOIN message_quoted ON message._id = message_quoted.message_row_id "
 		"LEFT JOIN message_quoted_media ON message_quoted.message_row_id = message_quoted_media.message_row_id "
@@ -55,13 +55,9 @@ void QueryMessagesThread::run()
 		"LEFT JOIN message_media ON message._id = message_media.message_row_id "
 		"LEFT JOIN message_location ON message._id = message_location.message_row_id "
 		"LEFT JOIN message_thumbnail ON message._id = message_thumbnail.message_row_id "
-		"LEFT JOIN ( "
-		"    SELECT key_id, MAX(remote_resource) AS remote_resource "
-		"    FROM receipts "
-		"    GROUP BY key_id "
-		") AS receipts ON message.key_id = receipts.key_id "
 		"JOIN chat ON chat._id = message.chat_row_id "
 		"JOIN jid ON jid._id = chat.jid_row_id "
+		"LEFT JOIN jid AS sender_jid ON sender_jid._id = message.sender_jid_row_id "
 		"WHERE jid.raw_string = ? "
 		"ORDER BY message.timestamp ASC";
 
